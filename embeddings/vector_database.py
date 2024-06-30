@@ -1,6 +1,7 @@
 from chromadb import Client
 from chromadb.config import Settings
 from chromadb.utils import embedding_functions
+from chromadb.utils.embedding_functions import DefaultEmbeddingFunction
 
 def initialize_vector_database():
     client = Client(Settings())
