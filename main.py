@@ -9,7 +9,6 @@ def load_listings(file_path):
     with open(file_path, 'r') as file:
         listings = json.load(file)
     
-    # Optionally, you can validate each listing here
     for listing in listings:
         if 'description' not in listing:
             raise ValueError(f"Listing {listing['Neighborhood']} is missing 'description' field.")
@@ -18,8 +17,8 @@ def load_listings(file_path):
 
 def main():
     client = initialize_vector_database()
-    listings_file = 'listings.json'  # Adjust file name as necessary
-    listings_path = os.path.join('D:\\udacity students projects\\HomeMatch\\data', listings_file)  # Adjust directory path as necessary
+    listings_file = 'listings.json' 
+    listings_path = os.path.join('D:\\udacity students projects\\HomeMatch\\data', listings_file)
     listings = load_listings(listings_path)
     collection = store_listings_in_database(client, listings)
 
