@@ -1,7 +1,7 @@
 import openai
 import json
 
-openai.api_key = 'YOUR_OPENAI_API_KEY'
+openai.api_key = 'sk-proj-pfhI94sKmrApbQvn1KzVT3BlbkFJAGozqlDF57yeYY0kM3Is'
 
 def personalize_listing_descriptions(listings, preferences):
     personalized_listings = []

@@ -1,26 +1,30 @@
-import chromadb
-from chromadb.utils.embedding_functions import openai_embedding
-import json
-
-client = None
-collection = None
+from chromadb import Client
+from chromadb.config import Settings
+from chromadb.utils import embedding_functions
 
 def initialize_vector_database():
-    global client, collection
-    client = chromadb.Client()
-    collection = client.create_collection("real_estate")
+    client = Client(Settings())
+    return client
 
-def store_listings_in_database(listings):
-    for idx, listing in enumerate(listings):
-        embedding = openai_embedding.embed_text(json.dumps(listing))
-        collection.insert(
-            data_id=f"listing_{idx}",
-            vector=embedding,
-            metadata=listing
-        )
+def store_listings_in_database(client, listings):
+    collection = client.create_collection("listings")
 
-def semantic_search(preferences):
-    query = json.dumps(preferences)
-    query_embedding = openai_embedding.embed_text(query)
-    results = collection.query(query_embedding, top_k=5)
+    for listing in listings:
+        embedding = generate_embedding(listing['description'])
+        collection.add_document({
+            'id': listing['id'],
+            'embedding': embedding,
+            'metadata': listing
+        })
+
+    return collection
+
+def generate_embedding(text):
+    # Use a generic embedding function from ChromaDB or another library
+    embedding_function = embedding_functions.default_embedding_function()
+    return embedding_function.embed(text)
+
+def semantic_search(collection, query):
+    embedding = generate_embedding(query)
+    results = collection.search(embedding, limit=5)
     return results

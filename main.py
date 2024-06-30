@@ -1,41 +1,21 @@
-from preferences.user_preferences import collect_buyer_preferences
 from embeddings.vector_database import initialize_vector_database, store_listings_in_database, semantic_search
-from descriptions.personalize_descriptions import personalize_listing_descriptions
 import json
 
+def load_listings(file_path):
+    with open(file_path, 'r') as file:
+        listings = json.load(file)
+    return listings
+
 def main():
-    # Load listings
-    with open('data/listings.json', 'r') as f:
-        listings = json.load(f)
-    
-    # Initialize the vector database for storing listings
-    initialize_vector_database()
-    store_listings_in_database(listings)
-    
-    # Collect the buyer preferences
-    buyer_preferences = collect_buyer_preferences()
-    
-    # searching to find matching listings
-    matched_listings = semantic_search(buyer_preferences)
-    
-    # Personalize the descriptions of the matched listings
-    personalized_listings = personalize_listing_descriptions(matched_listings, buyer_preferences)
-    
-    # Display personalized listings for user
-    display_personalized_listings(personalized_listings)
+    client = initialize_vector_database()
+    listings = load_listings('data/listings.json')
+    collection = store_listings_in_database(client, listings)
 
-def display_personalized_listings(personalized_listings):
-    for idx, listing in enumerate(personalized_listings):
-        print(f"Listing {idx + 1}:")
-        print("Neighborhood:", listing["Neighborhood"])
-        print("Price:", listing["Price"])
-        print("Bedrooms:", listing["Bedrooms"])
-        print("Bathrooms:", listing["Bathrooms"])
-        print("House Size:", listing["House Size"])
-        print("Original Description:", listing["Description"])
-        print("Personalized Description:", listing.get("Personalized Description", "N/A"))
-        print("Neighborhood Description:", listing["Neighborhood Description"])
-        print("\n")
+    user_query = input("Enter your preferences (e.g., 3 bedrooms, 2 bathrooms, Green Oaks, $800,000, backyard, modern kitchen): ")
+    results = semantic_search(collection, user_query)
 
-if __name__ == '__main__':
+    for result in results:
+        print(f"Matched Listing: {result['metadata']}")
+
+if __name__ == "__main__":
     main()
